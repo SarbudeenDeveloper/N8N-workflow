@@ -1,0 +1,353 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -160,
+        -16
+      ],
+      "id": "be6c767e-b541-4748-999d-570e44a83971",
+      "name": "When chat message received",
+      "webhookId": "f553e029-2fc4-4d1a-9157-c4f3a7ee3c3c"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.graphycards.com/api/v1/generate",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "={{ $json.key }}",
+              "value": "={{ $json.value }}"
+            },
+            {
+              "name": "output",
+              "value": "png"
+            },
+            {
+              "name": "contentStyle",
+              "value": "steps"
+            },
+            {
+              "name": "theme",
+              "value": "chalkboard-sticky"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        240,
+        -16
+      ],
+      "id": "81d25006-568b-4664-a3fd-2155115f7913",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "WssIrLL8bYOKXVm9",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "c2b49c09-a2f3-4f85-9e13-d6130cc46707",
+      "name": "Wait",
+      "webhookId": "842856e0-40e8-40ac-b40b-d29861669f4e"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.graphycards.com/api/v1/jobs/{{ $json.job.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        624,
+        0
+      ],
+      "id": "17c1ec77-e0b2-4674-a8bb-3743ba85d203",
+      "name": "HTTP Request1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "WssIrLL8bYOKXVm9",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "dcd10f8b-9443-4ac4-88bc-5ff542aa32a8",
+              "leftValue": "={{ $json.job.status }}",
+              "rightValue": "COMPLETED",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        832,
+        0
+      ],
+      "id": "4909d932-b3b3-494b-aed9-77905226c506",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "job.result.base64",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1040,
+        -96
+      ],
+      "id": "b3375b6e-4ad4-4145-abb1-553a43abdcb6",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "postAs": "organization",
+        "organization": "113328791",
+        "text": "={{ $('HTTP Request1').item.json.job.title }}",
+        "shareMediaCategory": "IMAGE",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        -96
+      ],
+      "id": "6166b145-6b8d-4c78-8730-b00a1f3bb356",
+      "name": "Create a post",
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "sq9YOorhefefGVCj",
+          "name": "LinkedIn OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of $input.all()) {\n  const chatInput = $input.first().json.chatInput || \"\";\n  \n  // Find the position of the very first colon\n  const firstColonIndex = chatInput.indexOf(':');\n\n  if (firstColonIndex !== -1) {\n    // Everything before the first colon\n    item.json.key = chatInput.substring(0, firstColonIndex).trim();\n    // Everything after the first colon\n    item.json.value = chatInput.substring(firstColonIndex + 1).trim();\n  } else {\n    // Fallback if no colon is found\n    item.json.key = chatInput;\n    item.json.value = \"\";\n  }\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        32,
+        -16
+      ],
+      "id": "25824ac9-6aeb-4a61-938f-def83d7d35c1",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "content": "Message sending formats\ntopic:<your topic>\nurl:<url of blog or article>\ncontent:<any copy pasted content>\npdf:<pdf base64>",
+        "height": 112,
+        "width": 352,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        -192
+      ],
+      "id": "27919216-f8d3-442f-86d0-23bbf7f65031",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Go to Credentials → Add → Header Auth\n  Name:  X-API-Key\n  Value: <paste your graphycards api key>\n\nIn Auth field choose your created auth\nAuth:   Header Auth (select credential)",
+        "height": 112,
+        "width": 352,
+        "color": "#FDD43F"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        128,
+        -192
+      ],
+      "id": "75f686fd-10bf-4dcf-ad38-09826a710e00",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "Go to Credentials → Add → Header Auth\n  Name:  X-API-Key\n  Value: <paste your graphycards api key>\n\nIn Auth field choose your created auth\nAuth:   Header Auth (select credential)",
+        "height": 112,
+        "width": 352,
+        "color": "#FDD43F"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        576,
+        -160
+      ],
+      "id": "368ea2dc-0832-49d7-b27d-f4269d77e045",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "In linkedin credential, login your linkedin account\n",
+        "height": 80,
+        "width": 352,
+        "color": "#FDD43F"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1136,
+        -224
+      ],
+      "id": "f26dd70e-ae66-432a-94d7-70dd3c02692c",
+      "name": "Sticky Note3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Create a post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "9fedc9bb-abf7-47bd-8ec4-4769604de1db",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1f3d3f236799fd98f1472a3fc1afbb7de52a35148dca9a0ae14cf6e80514c214"
+  },
+  "id": "LqIWWJWleVJ2cACr",
+  "tags": []
+}
