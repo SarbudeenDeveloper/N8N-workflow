@@ -1,0 +1,585 @@
+{
+  "name": "Content Agency",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.graphycards.com/api/v1/generate",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "={{ $json.Type }}",
+              "value": "={{ $json.Input }}"
+            },
+            {
+              "name": "output",
+              "value": "pdf"
+            },
+            {
+              "name": "contentStyle",
+              "value": "={{ $json.Mode }}"
+            },
+            {
+              "name": "theme",
+              "value": "={{ $json.Theme }}"
+            },
+            {
+              "name": "brandKitId",
+              "value": "={{ $json['Customer '] }}"
+            },
+            {
+              "name": "language",
+              "value": "={{ $json.Language }}"
+            },
+            {
+              "name": "renderFormat",
+              "value": "={{ $json['Render Format'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1104,
+        -64
+      ],
+      "id": "c22815f8-8d53-4468-9f1c-62c2f25c8d43",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "WssIrLL8bYOKXVm9",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -832,
+        -64
+      ],
+      "id": "827bc84e-f44b-4773-85bc-de464a6370f6",
+      "name": "Wait",
+      "webhookId": "842856e0-40e8-40ac-b40b-d29861669f4e"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.graphycards.com/api/v1/jobs/{{ $json.job.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -528,
+        -64
+      ],
+      "id": "7f7c609c-6cbc-4a9f-84d8-b8b03a2af51e",
+      "name": "HTTP Request1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "WssIrLL8bYOKXVm9",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "dcd10f8b-9443-4ac4-88bc-5ff542aa32a8",
+              "leftValue": "={{ $json.job.status }}",
+              "rightValue": "COMPLETED",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -208,
+        -64
+      ],
+      "id": "b6cce290-1201-4b95-b055-26385b7aca81",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "job.result.base64",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        48,
+        -80
+      ],
+      "id": "c1608493-4d24-4058-8c1b-f0cf30c19582",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "content": "1.Go to Credentials → Add → Header Auth\n  Name:  X-API-Key\n  Value: <paste your graphycards api key>\n\n2.In Auth field choose your created auth\nAuth:   Header Auth (select credential)\n\n3.And make sure all the field of google sheet, properly mapped here\n",
+        "height": 480,
+        "width": 304,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1216,
+        -272
+      ],
+      "id": "c27006c2-fb54-4acf-9050-ab5c1ac1ebae",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "Go to Credentials → Add → Header Auth\n  Name:  X-API-Key\n  Value: <paste your graphycards api key>\n\nIn Auth field choose your created auth\nAuth:   Header Auth (select credential)",
+        "height": 480,
+        "width": 352,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -656,
+        -272
+      ],
+      "id": "62aff51f-f983-4498-b6b1-080a21c17d6c",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "1. Load the sample google (given in the github repo) - put this to your google sheet\n\n2. Then connect credentials",
+        "height": 480,
+        "width": 352
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1616,
+        -272
+      ],
+      "id": "e884b14a-e3ff-47f0-9977-7a5acda2c674",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "name": "={{ $('HTTP Request1').item.json.job.title }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1Oniw024m3ogt-EfhN4vBnSjDBao1LEDk",
+          "mode": "list",
+          "cachedResultName": "Customer Social Media Posts",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1Oniw024m3ogt-EfhN4vBnSjDBao1LEDk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        352,
+        -80
+      ],
+      "id": "8519741d-41b7-4baa-b52f-bfe2fa3e641c",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "hEuh02yD2gVDxKL2",
+          "name": "Google Drive OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1-QuYukiINCaxdbvMJl1omOXlIE0RG5sB0KPeX8HZovw",
+          "mode": "list",
+          "cachedResultName": "Customer Social Media Plan",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-QuYukiINCaxdbvMJl1omOXlIE0RG5sB0KPeX8HZovw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-QuYukiINCaxdbvMJl1omOXlIE0RG5sB0KPeX8HZovw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Input": "={{ $('Get row(s) in sheet').item.json.Input }}",
+            "row_number": 0,
+            "Status": "ready",
+            "Preview Link": "={{ $json.webViewLink }}"
+          },
+          "matchingColumns": [
+            "Input"
+          ],
+          "schema": [
+            {
+              "id": "Input",
+              "displayName": "Input",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Type",
+              "displayName": "Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Customer ",
+              "displayName": "Customer ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Render Format",
+              "displayName": "Render Format",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Mode",
+              "displayName": "Mode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Theme",
+              "displayName": "Theme",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Language",
+              "displayName": "Language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Preview Link",
+              "displayName": "Preview Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        752,
+        -80
+      ],
+      "id": "1ac1ff06-2aac-4357-bff2-d852a0dcafd7",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Y5V2360K3QlPeZtj",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1-QuYukiINCaxdbvMJl1omOXlIE0RG5sB0KPeX8HZovw",
+          "mode": "list",
+          "cachedResultName": "Customer Social Media Plan",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-QuYukiINCaxdbvMJl1omOXlIE0RG5sB0KPeX8HZovw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-QuYukiINCaxdbvMJl1omOXlIE0RG5sB0KPeX8HZovw/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "process it"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1488,
+        -64
+      ],
+      "id": "8520082a-5541-47b3-9788-f05234b5af12",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Y5V2360K3QlPeZtj",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 3
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1760,
+        -64
+      ],
+      "id": "f5a1d73e-c588-431f-b894-0556b899a431",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "content": "1. Connect your credentials\n2. Choose a folder where a design needs to store\n",
+        "height": 480,
+        "width": 352,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        224,
+        -288
+      ],
+      "id": "f6d6f2ce-8566-42a0-9def-f955b377a0b1",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "1. Connect your credentials\n",
+        "height": 480,
+        "width": 352,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        624,
+        -288
+      ],
+      "id": "1bf3aa4c-6301-4ffd-a1e0-da6e4e56aedb",
+      "name": "Sticky Note4"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "4e608423-4e2a-4dd1-875f-7d42deb62b4e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1f3d3f236799fd98f1472a3fc1afbb7de52a35148dca9a0ae14cf6e80514c214"
+  },
+  "id": "sOtkyli5waRPN9YF",
+  "tags": []
+}
